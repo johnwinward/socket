@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     printf("/n");
 
     printf("Enter server port number: /n");
-    scan("%d", serverPort);
+    scanf("%d", &serverPort);
     printf("/n");
 
     printf("The IP address you entered is %s.", serverName);
