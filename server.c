@@ -6,7 +6,7 @@ int main(int argc, char *argv[]){
     int port;
 
     if(argc == 2){
-        port = argv[1];
+        port = atoi(argv[1]);
         //Debug
         printf("Port entered: %d", port);
     }
