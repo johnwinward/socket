@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 
-int main(int argc, const* argv[])
+int main(int argc, char* argv[])
 {
     char serverName[16];
     int serverPort = 0;
