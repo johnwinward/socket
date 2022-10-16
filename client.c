@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define PORT 54640
+
 
 int main(int argc, char* argv[])
 {
@@ -10,6 +12,7 @@ int main(int argc, char* argv[])
     int serverPort = 0;
     struct sockaddr_in serverName;
     int s = 0;
+    char servMes[8000];
 
     //Gather and display user input
     // printf("Enter server IP address: \n");
@@ -36,6 +39,34 @@ int main(int argc, char* argv[])
     }
 
     serverName.sin_family = AF_INET;
+    serverName.sin_port = htons(PORT);
+
+    //Connect to server
+    if(connect(s, struct sockaddr *) &serverName, sizeof(serverName) < 0)
+    {
+        printf("Error: failed to connect.");
+    }
+    else
+    {
+        printf("Connection established.");
+    }
+
+    //Sends message to server
+    send(s, clntMes, strlen(clntMes), 0);
+    printf("Message sent.");
+
+    //Receive and display message from server
+    if(recv(s, servMes, sizeof(servMes), 0) < 0)
+    {
+        printf("No message received.");
+    }
+    else
+    {
+        printf("%s\n", servMes);
+    }
+
+    //Close socket
+    close(s);
 
     return 0;
 }
