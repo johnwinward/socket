@@ -6,6 +6,9 @@ int main(int argc, char *argv[]){
     int port;
     int s;                   //Socket
     int sOpen;               //Open socket
+    char msgBuff[200000];    //Message Buffer and pointer to it
+    char *p_msgBuff = &msgBuff;
+    char ack[18] = "Message Recieved!";
     struct sockaddr_in sAdd; //Server Address/Port
     struct sockaddr_in cAdd; //Client Address/Port
 
@@ -47,8 +50,21 @@ int main(int argc, char *argv[]){
     }
     
     //Receive message
+    if(read(sOpen, p_msgBuff, sizeof(msgBuff)) == -1){
+        printf("Failure at read()\n");
+        return 1;
+    }
+
+    int i = 0;
+    char ch = msgBuff[i];
+    while(ch != "\0"){           //TODO: Change \0 to EOF
+        printf("%c", ch);
+        i++;
+        ch = msgBuff[i];
+    }
     
     //ACK message
+    
     
     //Close Socket
 
