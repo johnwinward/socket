@@ -16,8 +16,6 @@ int main(int argc, char *argv[]){
 
     if(argc == 2){
         port = (uint16_t) atoi(argv[1]);
-        //Debug
-        printf("Port entered: %d\n", port);
     }
     else{
         printf("Invalid # of arguments\n");
@@ -41,21 +39,21 @@ int main(int argc, char *argv[]){
     
     //Start listening
     if(listen(s, 1) == -1){
-        printf("Failure at listen()\n");
-        return 1;
+        perror("Failure at listen()");
+        exit(EXIT_FAILURE);
     }
     
     //Accept connection
     socklen_t cAdd_size = sizeof(cAdd);
     if((sOpen = accept(s, (struct sockaddr *) &cAdd, &cAdd_size)) == -1){
-        perror("Failure at accept()\n");
+        perror("Failure at accept()");
         exit(EXIT_FAILURE);
     }
     
     //Receive message
     if(read(sOpen, p_msgBuff, sizeof(msgBuff)) == -1){
-        printf("Failure at read()\n");
-        return 1;
+        perror("Failure at read()");
+        exit(EXIT_FAILURE);
     }
 
     //Print Message
@@ -70,8 +68,8 @@ int main(int argc, char *argv[]){
     
     //ACK message
     if(write(sOpen, (char *) &ack, sizeof(ack)) == -1){
-        printf("Failure at send()\n");
-        return 1;
+        perror("Failure at write()");
+        exit(EXIT_FAILURE);
     }
     
     //Close Socket

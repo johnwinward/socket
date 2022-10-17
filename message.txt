@@ -1,0 +1,4 @@
+This a test of an internet socket.
+This file will contain a message to be sent to the server from a client.
+Then, the server will send an acknowledgement message back.
+This file will be passed as input to the client.

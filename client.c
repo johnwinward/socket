@@ -3,15 +3,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <netinet/in.h>
-
-#define PORT 54640
-
+#include <stdlib.h>
 
 int main(int argc, char* argv[])
 {
     uint16_t port = (uint16_t) atoi(argv[2]);
-    char clntMes[34] = "This is the client! Hello server!";
-    //int serverPort = 0;
+    char clntMes[200000];
+    char *clntMes_p = clntMes;
     struct sockaddr_in serverName;
     int s;
     char servMes[200000];
@@ -19,8 +17,8 @@ int main(int argc, char* argv[])
     //Create socket
     if((s = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf("Error: could not create socket.\n");
-        return -1;
+        perror("Error: could not create socket");
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -31,12 +29,10 @@ int main(int argc, char* argv[])
     serverName.sin_port = htons(port);
 
     //Locate server
-    //No IP address entered yet
-    printf("%s\n", argv[1]);
     if((inet_pton(AF_INET, argv[1], &serverName.sin_addr.s_addr)) < 0)
     {
-        printf("Error: invalid address.\n");
-        return -1;
+        perror("Error: invalid address");
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -46,16 +42,24 @@ int main(int argc, char* argv[])
     //Connect to server
     if(connect(s, (struct sockaddr *) &serverName, sizeof(serverName)) < 0)
     {
-        printf("Error: failed to connect.\n");
+        perror("Failed to connect to server");
+        exit(EXIT_FAILURE);
     }
     else
     {
         printf("Connection established.\n");
     }
+    
+    //Read in message
+    printf("Begin typing message (CTRL D to send):\n");
+    while((*clntMes_p = getchar()) != EOF){
+        clntMes_p++;
+    }
+    *clntMes_p = '\0';
 
     //Sends message to server
     send(s, clntMes, strlen(clntMes), 0);
-    printf("Message sent.\n");
+    printf("\nMessage sent.\n");
 
     //Receive and display message from server
     if(recv(s, servMes, sizeof(servMes), 0) < 0)
