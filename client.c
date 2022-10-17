@@ -14,19 +14,6 @@ int main(int argc, char* argv[])
     int s = 0;
     char servMes[8000];
 
-    //Gather and display user input
-    // printf("Enter server IP address: \n");
-    // scanf("%s", serverName);
-    // printf("\n");
-
-    // printf("Enter server port number: \n");
-    // scanf("%d", &serverPort);
-    // printf("\n");
-
-    // printf("The IP address you entered is %s.", serverName);
-    // printf("The port number you entered is %d.", serverPort);
-    // printf("\n")
-
     //Create socket
     if((s = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -40,6 +27,18 @@ int main(int argc, char* argv[])
 
     serverName.sin_family = AF_INET;
     serverName.sin_port = htons(PORT);
+
+    //Locate server
+    //No IP address entered yet
+    if(inet_pton(AF_INET, "", &serverName.sin_addr) <= 0)
+    {
+        printf("Error: invalid address.");
+        return -1;
+    }
+    else
+    {
+        printf("Server located.");
+    }
 
     //Connect to server
     if(connect(s, struct sockaddr *) &serverName, sizeof(serverName) < 0)
