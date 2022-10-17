@@ -10,7 +10,7 @@ int main(int argc, char *argv[]){
     int sOpen;               //Open socket
     char msgBuff[200000];    //Message Buffer and pointer to it
     char *p_msgBuff = msgBuff;
-    char ack[18] = "Message Recieved!";
+    char ack[31] = "From Server: Message Recieved!";
     struct sockaddr_in sAdd; //Server Address/Port
     struct sockaddr_in cAdd; //Client Address/Port
 
@@ -30,14 +30,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    printf("%d\n", s);
-    
     //Bind address to socket
     sAdd.sin_family = AF_INET;
     sAdd.sin_addr.s_addr = htonl(INADDR_ANY);
     sAdd.sin_port = htons(port);
     if(bind(s, (struct sockaddr *) &sAdd, sizeof(sAdd)) == -1){
-       perror("bind failed");
+       perror("Failed to bind address to socket");
        exit(EXIT_FAILURE);
     }
     
@@ -48,9 +46,10 @@ int main(int argc, char *argv[]){
     }
     
     //Accept connection
-    if(sOpen = accept(s, (struct sockaddr *) &cAdd, sizeof(cAdd)) == -1){
-        printf("Failure at accept()\n");
-        return 1;
+    socklen_t cAdd_size = sizeof(cAdd);
+    if((sOpen = accept(s, (struct sockaddr *) &cAdd, &cAdd_size)) == -1){
+        perror("Failure at accept()\n");
+        exit(EXIT_FAILURE);
     }
     
     //Receive message
@@ -67,6 +66,7 @@ int main(int argc, char *argv[]){
         i++;
         ch = msgBuff[i];
     }
+    printf("\n");
     
     //ACK message
     if(write(sOpen, (char *) &ack, sizeof(ack)) == -1){
