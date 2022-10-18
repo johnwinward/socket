@@ -15,8 +15,6 @@ int main(int argc, char *argv[]){
     uint16_t port;
     int s;                              //Socket
     int sOpen;                          //Open socket
-    char msgBuff[200000];               //Message Buffer and pointer to it
-    char *p_msgBuff = msgBuff;          //Pointer to Message Buffer
     char ack[31] = "Message Recieved!"; //Message to send back to client
     struct sockaddr_in sAdd;            //Server Address/Port
     struct sockaddr_in cAdd;            //Client Address/Port
@@ -50,39 +48,42 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
     
-    //Accept connection
-    socklen_t cAdd_size = sizeof(cAdd);
-    if((sOpen = accept(s, (struct sockaddr *) &cAdd, &cAdd_size)) == -1){
-        perror("Failure at accept()");
-        exit(EXIT_FAILURE);
-    }
-    
-    //Receive message
-    if(read(sOpen, p_msgBuff, sizeof(msgBuff)) == -1){
-        perror("Failure at read()");
-        exit(EXIT_FAILURE);
-    }
+    while(1){
+        char *p_msgBuff = malloc(sizeof(char) * 200000);          //Pointer to Message Buffer
+        char *orig_p_msgBuff = p_msgBuff;
+        //Accept connection
+        socklen_t cAdd_size = sizeof(cAdd);
+        if((sOpen = accept(s, (struct sockaddr *) &cAdd, &cAdd_size)) == -1){
+            perror("Failure at accept()");
+            exit(EXIT_FAILURE);
+        }
 
-    //Print Message
-    printf("Message from %s:\n", inet_ntoa(cAdd.sin_addr));
-    int i = 0;
-    char ch = msgBuff[i];
-    while(ch != '\0'){           //TODO: Change \0 to EOF
-        printf("%c", ch);
-        i++;
-        ch = msgBuff[i];
+        //Receive message
+        if(read(sOpen, p_msgBuff, 200000 * sizeof(char)) == -1){
+            perror("Failure at read()");
+            exit(EXIT_FAILURE);
+        }
+
+        //Print Message
+        printf("Message from %s:\n", inet_ntoa(cAdd.sin_addr));
+        char ch = *p_msgBuff;
+        while(ch != '\0'){
+            printf("%c", ch);
+            p_msgBuff++;
+            ch = *p_msgBuff;
+        }
+        printf("\n");
+
+        //ACK message
+        if(write(sOpen, (char *) &ack, sizeof(ack)) == -1){
+            perror("Failure at write()");
+            exit(EXIT_FAILURE);
+        }
+
+        //Close Socket
+        shutdown(sOpen, 2);
+        free(orig_p_msgBuff);
     }
-    printf("\n");
-    
-    //ACK message
-    if(write(sOpen, (char *) &ack, sizeof(ack)) == -1){
-        perror("Failure at write()");
-        exit(EXIT_FAILURE);
-    }
-    
-    //Close Socket
-    shutdown(sOpen, 2);
-    shutdown(s, 2);
 
     return 0;
 }
