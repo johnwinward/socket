@@ -1,3 +1,9 @@
+/*
+    Authors: John Winward and Ben Chernin
+    Date: 10/17/2022
+    Desc: Assignment for CPSC 445: Networking
+*/
+
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <string.h>
@@ -20,10 +26,6 @@ int main(int argc, char* argv[])
         perror("Error: could not create socket");
         exit(EXIT_FAILURE);
     }
-    else
-    {
-        printf("Socket created.\n");
-    }
 
     serverName.sin_family = AF_INET;
     serverName.sin_port = htons(port);
@@ -34,10 +36,6 @@ int main(int argc, char* argv[])
         perror("Error: invalid address");
         exit(EXIT_FAILURE);
     }
-    else
-    {
-        printf("Server located.\n");
-    }
 
     //Connect to server
     if(connect(s, (struct sockaddr *) &serverName, sizeof(serverName)) < 0)
@@ -45,21 +43,20 @@ int main(int argc, char* argv[])
         perror("Failed to connect to server");
         exit(EXIT_FAILURE);
     }
-    else
-    {
-        printf("Connection established.\n");
-    }
     
     //Read in message
-    printf("Begin typing message (CTRL D to send):\n");
-    while((*clntMes_p = getchar()) != EOF){
+    printf("Begin typing message (CTRL D to send): ");
+    while(1){
+        *clntMes_p = getchar();
+        if(*clntMes_p == EOF){
+            break;
+        }
         clntMes_p++;
     }
     *clntMes_p = '\0';
 
     //Sends message to server
     send(s, clntMes, strlen(clntMes), 0);
-    printf("\nMessage sent.\n");
 
     //Receive and display message from server
     if(recv(s, servMes, sizeof(servMes), 0) < 0)
@@ -68,7 +65,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        printf("%s\n", servMes);
+        printf("\n%s\n", servMes);
     }
 
     //Close socket
